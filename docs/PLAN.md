@@ -31,7 +31,8 @@ Referencias entre corchetes (`[§4]`, `[I12]`, `[P6]`) apuntan a `docs/diseno-mv
 - `npm run reset`: borra la base, aplica el esquema y carga las semillas.
 - Semillas de catálogo: roles, permisos `[§3.3]`, plantillas de rol `[§9.4]`, tipos de actividad, categorías.
 - Semilla de demo: edificios y salones de ejemplo; personas de los cuatro roles más una cuenta de recepción, con códigos de acceso conocidos; **cronograma de dos días generado alrededor de la hora actual** (actividades terminadas, en curso y próximas, en paralelo en varias zonas) `[I7]`; llegadas y asistencias ya registradas en las actividades pasadas.
-- Utilidades `utils/fechas.ts` (UTC `YYYY-MM-DD HH:MM:SS`, día local de Bogotá) y `utils/codigo.ts` (generador con alfabeto de 32 caracteres).
+- Utilidades `utils/fechas.ts` (UTC `YYYY-MM-DD HH:MM:SS`, día local de Bogotá), `utils/codigo.ts` (generador con alfabeto de 32 caracteres) y `utils/hash.ts` con `bcryptjs`, que la semilla necesita para guardar los códigos de demo.
+- Catálogo de permisos y plantillas de rol como fuente única en `src/modulos/permisos/catalogo.ts`.
 
 **Aceptación.** `npm run reset` sobre una base vacía crea las 12 tablas y los datos; ejecutarlo dos veces seguidas funciona. Prueba de que las llaves foráneas se rechazan. Prueba de que el índice de I4 rechaza dos llegadas de la misma persona a las 08:00 y a las 19:30 hora de Bogotá del mismo día.
 
@@ -41,7 +42,6 @@ Referencias entre corchetes (`[§4]`, `[I12]`, `[P6]`) apuntan a `docs/diseno-mv
 
 **Objetivo.** Poder iniciar sesión y proteger rutas.
 
-- `utils/hash.ts` con `bcryptjs`.
 - `POST /auth/login`: busca por documento, verifica el hash, normaliza el código [§5]. Mismo `401` para todo fallo [regla 4].
 - Sesiones en memoria con token aleatorio y vigencia de 12 h; `POST /auth/salir`; `GET /auth/yo` con persona, rol y permisos.
 - Middleware `autenticacion` y `exigePermiso(codigo)`; los permisos se leen de la base en cada petición [reglas 8 y 9].
