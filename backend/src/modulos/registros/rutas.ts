@@ -19,6 +19,10 @@ export function rutasRegistros(ctx: Contexto): Router {
     res.json(servicio.buscarEnRecepcion(ctx, documento));
   });
 
+  rutas.get('/recepcion/resumen', exigePermiso('llegada.registrar'), (_req, res) => {
+    res.json(servicio.resumenRecepcion(ctx));
+  });
+
   rutas.post('/registros/llegada', exigePermiso('llegada.registrar'), (req, res) => {
     const { numero_documento } = esquemaLlegada.parse(req.body);
     res.status(201).json(servicio.registrarLlegada(ctx, sesionDe(res), numero_documento));

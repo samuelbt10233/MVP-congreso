@@ -264,6 +264,18 @@ describe('recepción y llegadas', () => {
     expect(otroDia.body.total).toBe(0);
   });
 
+  it('GET /recepcion/resumen da a recepción el total del día sin nombres', async () => {
+    const recepcion = await entorno.como('recepcion');
+    const antes = await recepcion.get('/api/v1/recepcion/resumen');
+    expect(antes.status).toBe(200);
+    expect(Object.keys(antes.body).sort()).toEqual(['dia', 'llegadas']);
+    await registrarLlegada();
+    const despues = await recepcion.get('/api/v1/recepcion/resumen');
+    expect(despues.body).toEqual({ dia: DIA, llegadas: antes.body.llegadas + 1 });
+    const visitante = await entorno.como('visitante');
+    expect((await visitante.get('/api/v1/recepcion/resumen')).status).toBe(403);
+  });
+
   it('recepción no puede consultar el listado de llegadas', async () => {
     const recepcion = await entorno.como('recepcion');
     expect((await recepcion.get('/api/v1/registros/llegada')).status).toBe(403);

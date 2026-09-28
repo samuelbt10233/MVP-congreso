@@ -99,6 +99,7 @@
 .etiqueta--alerta {
   background: var(--color-error);
   margin-left: 0.5rem;
+  text-transform: none;
 }
 
 /* ---------- Acceso ---------- */
@@ -314,4 +315,289 @@
 }
 .escarapela--visitante {
   --color-rol: var(--rol-visitante);
+}
+
+/* ---------- Utilidades de gestión ---------- */
+
+.titulo-con-accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: var(--pico-spacing);
+}
+
+.titulo-con-accion > * {
+  margin-bottom: 0;
+}
+
+.texto-tenue {
+  color: var(--pico-muted-color);
+}
+
+.numeros {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+button.enlace {
+  all: unset;
+  cursor: pointer;
+  color: var(--pico-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+button.enlace:focus-visible {
+  outline: 2px solid var(--pico-primary);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.acciones-fila {
+  white-space: nowrap;
+}
+
+.acciones-fila button,
+button.cerrar {
+  padding: 0.25rem 0.75rem;
+  margin: 0 0.25rem 0 0;
+  font-size: 0.875rem;
+}
+
+.selector-dia {
+  max-width: 20rem;
+}
+
+.fila--cancelada td {
+  color: var(--pico-muted-color);
+}
+
+.mensaje--aviso {
+  border-color: #b36b00;
+  background: color-mix(in srgb, #fab219 15%, transparent);
+}
+
+.etiqueta--en-curso {
+  background: var(--color-exito);
+  margin-left: 0.5rem;
+  text-transform: none;
+}
+
+/* ---------- Directorio (P6) ---------- */
+
+.directorio {
+  display: grid;
+  gap: calc(var(--pico-spacing) * 1.5);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .directorio:has(.panel-lateral) {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+  .panel-lateral {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+}
+
+.panel-lateral article {
+  margin: 0;
+}
+
+.tabla-seleccionable tr[aria-selected='true'] td {
+  background: color-mix(in srgb, var(--pico-primary) 12%, transparent);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.paginacion button {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+}
+
+/* ---------- Código de acceso visible una vez ---------- */
+
+.codigo-una-vez {
+  margin: var(--pico-spacing) 0;
+  padding: 1rem;
+  border: 2px dashed var(--color-marca);
+  border-radius: var(--pico-border-radius);
+  text-align: center;
+}
+
+.codigo-una-vez p {
+  margin-bottom: 0.5rem;
+}
+
+.codigo-una-vez__valor {
+  display: block;
+  margin: 0.5rem 0;
+  font-family: var(--pico-font-family-monospace);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+}
+
+/* ---------- Recepción (P11) ---------- */
+
+.recepcion {
+  max-width: 40rem;
+}
+
+.contador strong {
+  font-size: 1.75rem;
+  margin-left: 0.5rem;
+}
+
+.ficha-recepcion h2 {
+  margin-bottom: 0.5rem;
+}
+
+.etiqueta[class*='etiqueta--rol-'] {
+  font-size: 1rem;
+  padding: 0.15rem 0.75rem;
+  color: #fff;
+}
+
+.etiqueta--rol-administrador {
+  background: var(--rol-administrador);
+}
+.etiqueta--rol-organizador {
+  background: var(--rol-organizador);
+}
+.etiqueta--rol-participante {
+  background: var(--rol-participante);
+}
+.etiqueta--rol-visitante {
+  background: var(--rol-visitante);
+}
+
+/* ---------- Gestión de actividades (P9) ---------- */
+
+.formulario-actividad {
+  max-width: 48rem;
+}
+
+/* ---------- Panel (P12) ---------- */
+
+/* Medidor: un solo tono (serie secuencial azul) sobre una pista más clara de la
+   misma escala; validado contra la superficie clara y la oscura de Pico. */
+:root {
+  --medidor-relleno: #2a78d6;
+  --medidor-pista: #cde2fb;
+  --medidor-lleno: #d03b3b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --medidor-relleno: #3987e5;
+    --medidor-pista: #184f95;
+  }
+}
+
+.indicadores {
+  display: grid;
+  gap: var(--pico-spacing);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  margin-bottom: var(--pico-spacing);
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.indicador__etiqueta {
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
+}
+
+.indicador__valor {
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.medidor-celda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+}
+
+.medidor {
+  display: inline-block;
+  width: 8rem;
+  height: 0.6rem;
+  border-radius: 0.3rem;
+  background: var(--medidor-pista);
+  overflow: hidden;
+}
+
+.medidor > span {
+  display: block;
+  height: 100%;
+  border-radius: 0 0.3rem 0.3rem 0;
+  background: var(--medidor-relleno);
+}
+
+.medidor--lleno > span {
+  background: var(--medidor-lleno);
+}
+
+/* Casilla de permiso: la descripción en su propia línea, sin el margen negativo
+   que Pico da a los textos de ayuda dentro de <label>. */
+.opcion-permiso {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.opcion-permiso input {
+  margin-top: 0.2rem;
+}
+
+.opcion-permiso__descripcion {
+  display: block;
+  color: var(--pico-muted-color);
+  font-size: 0.85rem;
+}
+
+/* Las tablas se desplazan dentro de su figura en lugar de ensanchar la página. */
+main figure {
+  position: relative;
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .ocultar-movil {
+    display: none;
+  }
 }

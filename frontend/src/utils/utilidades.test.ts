@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { normalizarCodigo } from './codigo';
-import { diaBogota, hora, nombreDia, rangoHoras } from './fechas';
+import { diaBogota, hora, isoBogota, nombreDia, rangoHoras } from './fechas';
 
 describe('normalizarCodigo', () => {
   it('pasa a mayúsculas y quita espacios y guiones', () => {
@@ -20,5 +20,11 @@ describe('fechas en hora de Bogotá', () => {
 
   it('muestra un rango de horas', () => {
     expect(rangoHoras('2026-10-15 13:00:00', '2026-10-15 14:30:00')).toBe('08:00 – 09:30');
+  });
+});
+
+describe('isoBogota', () => {
+  it('arma el instante con la zona de Bogotá', () => {
+    expect(isoBogota('2026-10-15', '08:30')).toBe('2026-10-15T08:30:00-05:00');
   });
 });

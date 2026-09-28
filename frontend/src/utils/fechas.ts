@@ -54,3 +54,8 @@ export function rangoHoras(inicio: string, fin: string): string {
 export function fechaHora(valor: string): string {
   return `${nombreDia(diaBogota(valor))}, ${hora(valor)}`;
 }
+
+/** Instante ISO-8601 con la zona de Bogotá, como lo acepta la API: '2026-10-15T08:00:00-05:00'. */
+export function isoBogota(dia: string, horaMinuto: string): string {
+  return `${dia}T${horaMinuto}:00-05:00`;
+}

@@ -124,3 +124,80 @@ export type ActividadEstadistica = {
   ocupacion: number | null;
   en_curso: boolean;
 };
+
+export type Persona = {
+  id: number;
+  tipo_documento: string;
+  /** Enmascarado ('****4567') sin `persona.editar`. */
+  numero_documento: string;
+  nombres: string;
+  apellidos: string;
+  organizacion: string | null;
+  nacionalidad: string | null;
+  descripcion: string | null;
+  rol_id: number;
+  rol: string;
+  activo: boolean;
+  /** Solo con `persona.editar`. */
+  correo?: string | null;
+  telefono?: string | null;
+};
+
+export type PaginaPersonas = {
+  items: Persona[];
+  pagina: number;
+  por_pagina: number;
+  total: number;
+};
+
+export type DatosPersona = {
+  tipo_documento: string;
+  numero_documento: string;
+  nombres: string;
+  apellidos: string;
+  correo?: string | null;
+  telefono?: string | null;
+  organizacion?: string | null;
+  nacionalidad?: string | null;
+  descripcion?: string | null;
+  rol_id?: number;
+  activo?: boolean;
+};
+
+export type AltaPersona = {
+  persona: Persona;
+  permisos: CodigoPermiso[];
+  codigo_acceso: string;
+};
+
+export type DatosActividad = {
+  nombre: string;
+  descripcion: string | null;
+  tipo_actividad_id: number;
+  categoria_id: number | null;
+  zona_id: number;
+  responsable_id: number | null;
+  inicio: string;
+  fin: string;
+};
+
+export type PersonaRecepcion = {
+  persona: { id: number; nombres: string; apellidos: string; rol: string; activo: boolean };
+  llegada_hoy: { fecha_hora: string } | null;
+};
+
+export type LlegadaRegistrada = {
+  persona: PersonaRecepcion['persona'];
+  llegada: { id: number; fecha_hora: string };
+};
+
+export type LlegadasDelDia = {
+  dia: string;
+  total: number;
+  llegadas: {
+    id: number;
+    fecha_hora: string;
+    persona: { id: number; nombres: string; apellidos: string; rol: string };
+    registrado_por: { id: number; nombres: string; apellidos: string };
+  }[];
+};

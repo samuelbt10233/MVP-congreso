@@ -3,28 +3,29 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { ProveedorSesion } from '../auth/sesion';
 import { Acceso } from '../paginas/Acceso';
 import { Cronograma } from '../paginas/Cronograma';
-import { EnConstruccion } from '../paginas/EnConstruccion';
+import { GestionActividades } from '../paginas/GestionActividades';
 import { Inicio } from '../paginas/Inicio';
 import { MiPerfil } from '../paginas/MiPerfil';
 import { MisAsistencias } from '../paginas/MisAsistencias';
 import { NoEncontrada } from '../paginas/NoEncontrada';
+import { Panel } from '../paginas/Panel';
+import { Personas } from '../paginas/Personas';
+import { Recepcion } from '../paginas/Recepcion';
 import { RegistrarAsistencia } from '../paginas/RegistrarAsistencia';
 import { RequierePantalla, RequiereSesion } from './guardas';
 import { PANTALLAS, type ClavePantalla } from './pantallas';
 
-const enConstruccion = (titulo: string) => () => <EnConstruccion titulo={titulo} />;
-
-/** Componente de cada pantalla. Las de gestión llegan en el incremento 7. */
+/** Componente de cada pantalla. */
 const COMPONENTES: Record<ClavePantalla, ComponentType> = {
   inicio: Inicio,
   cronograma: Cronograma,
   perfil: MiPerfil,
   asistencia: RegistrarAsistencia,
   misAsistencias: MisAsistencias,
-  personas: enConstruccion(PANTALLAS.personas.titulo),
-  actividades: enConstruccion(PANTALLAS.actividades.titulo),
-  recepcion: enConstruccion(PANTALLAS.recepcion.titulo),
-  panel: enConstruccion(PANTALLAS.panel.titulo),
+  personas: Personas,
+  actividades: GestionActividades,
+  recepcion: Recepcion,
+  panel: Panel,
 };
 
 export function Rutas() {

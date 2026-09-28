@@ -523,7 +523,8 @@ export async function sembrarDemo(bd: BaseDatos, ahora = new Date()): Promise<Re
     VALUES (@tipoDocumento, @numeroDocumento, @nombres, @apellidos, @correo,
             @organizacion, @nacionalidad, @rolId, @descripcion)`);
   const insertarAutorizacion = bd.prepare(
-    'INSERT OR IGNORE INTO autorizacion (persona_id, permiso_id, otorgado_por) VALUES (?, ?, ?)',
+    `INSERT INTO autorizacion (persona_id, permiso_id, otorgado_por) VALUES (?, ?, ?)
+     ON CONFLICT (persona_id, permiso_id) DO NOTHING`,
   );
   const insertarUsuario = bd.prepare(
     'INSERT INTO usuario (persona_id, codigo_hash, codigo_rotado_en) VALUES (?, ?, ?)',

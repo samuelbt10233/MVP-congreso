@@ -15,6 +15,7 @@ import {
   buscarAsistencia,
   buscarLlegadaEnRango,
   buscarPersonaPorDocumento,
+  contarLlegadas,
   insertarAsistencia,
   insertarLlegada,
   listarAsistenciasDe,
@@ -57,6 +58,13 @@ export function buscarEnRecepcion(ctx: Contexto, numeroDocumento: string) {
     persona: resumenPersona(persona),
     llegada_hoy: llegada ? { fecha_hora: llegada.fecha_hora } : null,
   };
+}
+
+/** Contador de la pantalla de recepción (§9.6): solo el total, sin nombres. */
+export function resumenRecepcion(ctx: Contexto) {
+  const dia = diaBogota(ctx.ahora());
+  const { desde, hasta } = rangoUtcDeDia(dia);
+  return { dia, llegadas: contarLlegadas(ctx.bd, desde, hasta) };
 }
 
 /** I4: una llegada por persona y día local de Bogotá. */

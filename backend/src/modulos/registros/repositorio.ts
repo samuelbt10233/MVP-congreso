@@ -54,6 +54,15 @@ export function insertarLlegada(
   return Number(resultado.lastInsertRowid);
 }
 
+export function contarLlegadas(bd: BaseDatos, desde: string, hasta: string): number {
+  const { total } = bd
+    .prepare(
+      'SELECT COUNT(*) AS total FROM registro_llegada WHERE fecha_hora >= ? AND fecha_hora < ?',
+    )
+    .get(desde, hasta) as { total: number };
+  return total;
+}
+
 export type FilaLlegada = {
   id: number;
   fecha_hora: string;

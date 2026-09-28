@@ -354,12 +354,13 @@ El campo `codigo` solo se incluye en las respuestas para quien tenga `actividad.
 | Método | Ruta | Permiso |
 |---|---|---|
 | `GET` | `/recepcion/buscar?documento=` | `llegada.registrar` |
+| `GET` | `/recepcion/resumen` | `llegada.registrar` |
 | `POST` | `/registros/llegada` | `llegada.registrar` |
 | `GET` | `/registros/llegada?dia=` | `registro.leer` |
 | `POST` | `/registros/asistencia` | — |
 | `GET` | `/registros/asistencia/mias` | — |
 
-`POST /registros/llegada` recibe `numero_documento`. `POST /registros/asistencia` recibe `codigo` y toma la persona del token.
+`GET /recepcion/resumen` devuelve solo el total de llegadas del día, para el contador de la pantalla de recepción (§9.6), sin exigir `registro.leer`. `POST /registros/llegada` recibe `numero_documento`. `POST /registros/asistencia` recibe `codigo` y toma la persona del token.
 
 ### Estadísticas
 

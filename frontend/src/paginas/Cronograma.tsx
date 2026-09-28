@@ -7,7 +7,8 @@ import { usePerfil } from '../auth/sesion';
 import { Puede } from '../auth/Puede';
 import { usePermisos } from '../auth/usePermisos';
 import { Cargando, MensajeError } from '../componentes/Estado';
-import { diaBogota, hora, nombreDia, rangoHoras } from '../utils/fechas';
+import { ListaAsistentes } from '../componentes/ListaAsistentes';
+import { diaBogota, nombreDia, rangoHoras } from '../utils/fechas';
 
 const FILTROS = ['dia', 'zona_id', 'tipo_id', 'categoria_id'] as const;
 
@@ -185,40 +186,5 @@ function TarjetaActividad({ actividad: a }: { actividad: Actividad }) {
         {verAsistentes && <ListaAsistentes actividadId={a.id} />}
       </div>
     </details>
-  );
-}
-
-function ListaAsistentes({ actividadId }: { actividadId: number }) {
-  const { datos, error, cargando } = useCarga(
-    () => api.actividades.asistentes(actividadId),
-    [actividadId],
-  );
-  if (cargando) return <Cargando />;
-  if (error) return <MensajeError error={error} />;
-  if (!datos || datos.total === 0) return <p>Aún no hay asistentes registrados.</p>;
-  return (
-    <figure>
-      <table className="striped">
-        <caption>{datos.total} asistentes</caption>
-        <thead>
-          <tr>
-            <th>Nombre</th>
-            <th>Organización</th>
-            <th>Hora</th>
-          </tr>
-        </thead>
-        <tbody>
-          {datos.asistentes.map((r) => (
-            <tr key={r.persona.id}>
-              <td>
-                {r.persona.nombres} {r.persona.apellidos}
-              </td>
-              <td>{r.persona.organizacion ?? '—'}</td>
-              <td>{hora(r.fecha_hora)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </figure>
   );
 }
