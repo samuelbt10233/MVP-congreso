@@ -152,7 +152,7 @@ export async function darDeAlta(ctx: Contexto, sesion: SesionActiva, datos: Dato
     }
     const id = insertarPersona(ctx.bd, { ...datos, rol_id: rolId });
     otorgarPermisos(ctx.bd, id, PLANTILLAS_ROL[rol], sesion.persona.id);
-    guardarCodigo(ctx.bd, id, codigoHash, aUtcSql(new Date()));
+    guardarCodigo(ctx.bd, id, codigoHash, aUtcSql(ctx.ahora()));
     return id;
   })();
 
@@ -222,6 +222,6 @@ export async function generarCodigo(ctx: Contexto, id: number) {
   const codigo = generarCodigoAcceso();
   const codigoHash = await hashCodigo(codigo);
   const creado = !tieneUsuario(ctx.bd, id);
-  guardarCodigo(ctx.bd, id, codigoHash, aUtcSql(new Date()));
+  guardarCodigo(ctx.bd, id, codigoHash, aUtcSql(ctx.ahora()));
   return { creado, codigo_acceso: codigo };
 }

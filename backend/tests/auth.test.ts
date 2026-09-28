@@ -195,7 +195,7 @@ describe('exigePermiso', () => {
   }
 
   async function pedir(token?: string) {
-    const app = appProtegida({ bd: entorno.bd, sesiones: entorno.sesiones });
+    const app = appProtegida(entorno.ctx);
     const peticion = request(app).get('/protegida');
     return registrar(await (token ? peticion.set('Authorization', `Bearer ${token}`) : peticion));
   }

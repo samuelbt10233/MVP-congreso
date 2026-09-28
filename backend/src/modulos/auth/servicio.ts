@@ -37,7 +37,7 @@ export async function iniciarSesion(
     throw credencialesInvalidas();
   }
 
-  registrarAcceso(ctx.bd, credencial.persona_id, aUtcSql(new Date()));
+  registrarAcceso(ctx.bd, credencial.persona_id, aUtcSql(ctx.ahora()));
   const perfil = perfilDe(ctx, credencial.persona_id);
   if (!perfil) throw credencialesInvalidas();
   return { token: ctx.sesiones.crear(credencial.persona_id), ...perfil };

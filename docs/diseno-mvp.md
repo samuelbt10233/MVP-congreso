@@ -270,7 +270,7 @@ I11 (no escalada al regenerar códigos) queda pospuesta. En su lugar, `usuario.g
 
 ### Ventana de registro de asistencia (I7)
 
-Desde 15 minutos antes de `inicio` hasta el momento de `fin`. Fuera de esa ventana el código se rechaza aunque sea correcto.
+Desde 15 minutos antes de `inicio` hasta el momento de `fin`, ambos incluidos. Fuera de esa ventana el código se rechaza aunque sea correcto.
 
 El margen es configurable con la variable de entorno `VENTANA_ASISTENCIA_ANTES_MIN` (por defecto `15`). **Confirmar el valor con el cliente** en la demo.
 
@@ -390,8 +390,8 @@ Códigos de error estables que el frontend puede interpretar:
 | `401` | `CREDENCIALES_INVALIDAS` (login), `NO_AUTENTICADO` (sin sesión o vencida) |
 | `403` | `SIN_PERMISO` (`detalle.permiso`), `ALTA_ROL_NO_PERMITIDA` (I12) |
 | `404` | `RUTA_NO_ENCONTRADA`, `PERSONA_NO_ENCONTRADA`, `ACTIVIDAD_NO_ENCONTRADA` |
-| `409` | `DOCUMENTO_DUPLICADO`, `HORARIO_OCUPADO` (`detalle.actividad` es la que ocupa la zona), `ACTIVIDAD_YA_CANCELADA` |
-| `422` | `HORARIO_INVALIDO` (I2), `REFERENCIA_INVALIDA` (`detalle.campo`), `AUTOREVOCACION_NO_PERMITIDA` (I13) |
+| `409` | `DOCUMENTO_DUPLICADO`, `HORARIO_OCUPADO` (`detalle.actividad` es la que ocupa la zona), `ACTIVIDAD_YA_CANCELADA`, `LLEGADA_YA_REGISTRADA` y `ASISTENCIA_YA_REGISTRADA` (`detalle.fecha_hora` del registro previo) |
+| `422` | `HORARIO_INVALIDO` (I2), `REFERENCIA_INVALIDA` (`detalle.campo`), `AUTOREVOCACION_NO_PERMITIDA` (I13), `CODIGO_ACTIVIDAD_INVALIDO`, `ACTIVIDAD_CANCELADA` (I9), `FUERA_DE_VENTANA` (I7, `detalle.abre` y `detalle.cierra`) |
 
 Los instantes (`inicio`, `fin`) se reciben en ISO-8601 con zona horaria explícita (`2026-10-15T08:00:00-05:00`) o en UTC `YYYY-MM-DD HH:MM:SS`, y siempre se devuelven en UTC `YYYY-MM-DD HH:MM:SS`.
 

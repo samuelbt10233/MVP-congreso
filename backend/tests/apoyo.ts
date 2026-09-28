@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { CUENTAS_DEMO } from '../database/semillas/demo.js';
 import { crearApp } from '../src/app.js';
+import type { Contexto } from '../src/contexto.js';
 import { abrirBase } from '../src/db/conexion.js';
 import { poblarBase } from '../src/db/reset.js';
 import { AlmacenSesiones } from '../src/modulos/auth/sesiones.js';
@@ -12,11 +13,24 @@ export function cuenta(clave: ClaveCuenta) {
 }
 
 /** App sobre una base en memoria con la semilla de demo. */
-export async function crearEntorno(opciones: { sesiones?: AlmacenSesiones; ahora?: Date } = {}) {
+export async function crearEntorno(
+  opciones: { sesiones?: AlmacenSesiones; ahora?: Date; ventanaAsistenciaAntesMin?: number } = {},
+) {
   const bd = abrirBase(':memory:');
-  await poblarBase(bd, { ahora: opciones.ahora });
+  // La semilla y el reloj del servidor parten del mismo instante; `fijarHora` lo mueve.
+  let horaActual = opciones.ahora ?? new Date();
+  await poblarBase(bd, { ahora: horaActual });
   const sesiones = opciones.sesiones ?? new AlmacenSesiones();
-  const app = crearApp({ bd, sesiones });
+  const ctx: Contexto = {
+    bd,
+    sesiones,
+    ahora: () => horaActual,
+    ventanaAsistenciaAntesMin: opciones.ventanaAsistenciaAntesMin ?? 15,
+  };
+  const app = crearApp(ctx);
+  const fijarHora = (instante: Date) => {
+    horaActual = instante;
+  };
 
   async function tokenDe(clave: ClaveCuenta): Promise<string> {
     const c = cuenta(clave);
@@ -49,5 +63,5 @@ export async function crearEntorno(opciones: { sesiones?: AlmacenSesiones; ahora
     return fila.id;
   }
 
-  return { bd, sesiones, app, tokenDe, como, idDe };
+  return { bd, sesiones, ctx, app, tokenDe, como, idDe, fijarHora };
 }
