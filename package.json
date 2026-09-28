@@ -1,0 +1,26 @@
+{
+  "name": "mvp-congreso",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,magenta \"npm run dev:api\" \"npm run dev:web\"",
+    "dev:api": "npm run dev -w backend",
+    "dev:web": "npm run dev -w frontend",
+    "reset": "npm run reset -w backend",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "prettier": "^3.9.9",
+    "typescript": "^7.0.2"
+  }
+}
