@@ -1,0 +1,603 @@
+/* Ajustes sobre Pico CSS. Los colores de rol solo decoran la escarapela: el rol es
+   un estatus que se muestra, no decide qué se ve (regla 8). */
+
+:root {
+  --color-marca: #1d4f91;
+  --color-exito: #1e7a46;
+  --color-error: #b3261e;
+  --rol-administrador: #5b2c83;
+  --rol-organizador: #1d4f91;
+  --rol-participante: #b35c00;
+  --rol-visitante: #2e7d32;
+}
+
+/* ---------- Encabezado ---------- */
+
+.encabezado {
+  border-bottom: 1px solid var(--pico-muted-border-color);
+  margin-bottom: var(--pico-spacing);
+}
+
+.encabezado__fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding-top: 0.75rem;
+}
+
+.encabezado__marca {
+  color: var(--color-marca);
+  font-size: 1.15rem;
+}
+
+.encabezado__usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.encabezado__usuario button {
+  padding: 0.25rem 0.75rem;
+  margin: 0;
+}
+
+.encabezado nav .menu {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0 1.25rem;
+  margin: 0;
+  padding: 0.5rem 0;
+}
+
+.encabezado nav .menu li {
+  padding: 0.2rem 0;
+}
+
+.encabezado nav .menu a {
+  display: inline-block;
+  margin: 0;
+  padding: 0.2rem 0;
+}
+
+.menu a[aria-current='page'] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* ---------- Mensajes y etiquetas ---------- */
+
+.mensaje {
+  padding: 0.75rem 1rem;
+  border-radius: var(--pico-border-radius);
+  border-left: 4px solid;
+}
+
+.mensaje--error {
+  border-color: var(--color-error);
+  background: color-mix(in srgb, var(--color-error) 10%, transparent);
+}
+
+.mensaje--exito {
+  border-color: var(--color-exito);
+  background: color-mix(in srgb, var(--color-exito) 10%, transparent);
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 0 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75em;
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+  text-transform: capitalize;
+  vertical-align: middle;
+}
+
+.etiqueta--alerta {
+  background: var(--color-error);
+  margin-left: 0.5rem;
+  text-transform: none;
+}
+
+/* ---------- Acceso ---------- */
+
+.acceso {
+  max-width: 28rem;
+  padding-top: 10vh;
+}
+
+.campo-codigo {
+  font-family: var(--pico-font-family-monospace);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.campo-codigo--grande {
+  font-size: 2rem;
+  text-align: center;
+}
+
+.registro-asistencia {
+  max-width: 28rem;
+}
+
+/* ---------- Inicio ---------- */
+
+.grid-bloques {
+  display: grid;
+  gap: var(--pico-spacing);
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.grid-bloques article {
+  margin: 0;
+}
+
+.cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.cifras dd {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.cifras dt {
+  font-size: 0.85rem;
+}
+
+/* ---------- Cronograma ---------- */
+
+.filtros {
+  display: grid;
+  gap: 0 var(--pico-spacing);
+  grid-template-columns: minmax(16rem, 1.4fr) repeat(3, minmax(10rem, 1fr));
+}
+
+@media (max-width: 1024px) {
+  .filtros {
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+}
+
+.actividad {
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.actividad summary {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0 1rem;
+}
+
+.actividad summary::after {
+  display: none;
+}
+
+.actividad__hora {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.actividad__lugar {
+  grid-column: 2;
+  color: var(--pico-muted-color);
+}
+
+.actividad--cancelada {
+  opacity: 0.7;
+}
+
+.actividad__detalle {
+  margin-top: 0.75rem;
+}
+
+.actividad__detalle dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.actividad__detalle dd {
+  margin: 0;
+}
+
+.codigo-actividad {
+  font-size: 1.25rem;
+  letter-spacing: 0.2em;
+}
+
+/* ---------- Perfil y escarapela ---------- */
+
+.perfil {
+  display: grid;
+  gap: calc(var(--pico-spacing) * 2);
+  grid-template-columns: minmax(16rem, 20rem) 1fr;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .perfil {
+    grid-template-columns: 1fr;
+  }
+  .actividad summary {
+    grid-template-columns: 1fr;
+  }
+  .actividad__lugar {
+    grid-column: 1;
+  }
+}
+
+.datos div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 11rem) minmax(0, 1fr);
+  gap: 0 0.5rem;
+}
+
+.datos dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.escarapela {
+  --color-rol: var(--color-marca);
+  width: 100%;
+  max-width: 20rem;
+  margin: 0 auto;
+  aspect-ratio: 2 / 3;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #fff;
+  color: #1b1b1b;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.15);
+  text-align: center;
+}
+
+.escarapela header {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: var(--color-marca);
+  color: #fff;
+}
+
+.escarapela header small {
+  font-size: 0.7rem;
+}
+
+.escarapela__nombre {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  padding: 0 1rem;
+}
+
+.escarapela__organizacion,
+.escarapela__pais {
+  margin: 0 1rem 0.5rem;
+  color: #444;
+}
+
+.escarapela__rol {
+  padding: 0.75rem;
+  background: var(--color-rol);
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.escarapela--administrador {
+  --color-rol: var(--rol-administrador);
+}
+.escarapela--organizador {
+  --color-rol: var(--rol-organizador);
+}
+.escarapela--participante {
+  --color-rol: var(--rol-participante);
+}
+.escarapela--visitante {
+  --color-rol: var(--rol-visitante);
+}
+
+/* ---------- Utilidades de gestión ---------- */
+
+.titulo-con-accion {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: var(--pico-spacing);
+}
+
+.titulo-con-accion > * {
+  margin-bottom: 0;
+}
+
+.texto-tenue {
+  color: var(--pico-muted-color);
+}
+
+.numeros {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.visualmente-oculto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+button.enlace {
+  all: unset;
+  cursor: pointer;
+  color: var(--pico-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+button.enlace:focus-visible {
+  outline: 2px solid var(--pico-primary);
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.acciones-fila {
+  white-space: nowrap;
+}
+
+.acciones-fila button,
+button.cerrar {
+  padding: 0.25rem 0.75rem;
+  margin: 0 0.25rem 0 0;
+  font-size: 0.875rem;
+}
+
+.selector-dia {
+  max-width: 20rem;
+}
+
+.fila--cancelada td {
+  color: var(--pico-muted-color);
+}
+
+.mensaje--aviso {
+  border-color: #b36b00;
+  background: color-mix(in srgb, #fab219 15%, transparent);
+}
+
+.etiqueta--en-curso {
+  background: var(--color-exito);
+  margin-left: 0.5rem;
+  text-transform: none;
+}
+
+/* ---------- Directorio (P6) ---------- */
+
+.directorio {
+  display: grid;
+  gap: calc(var(--pico-spacing) * 1.5);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .directorio:has(.panel-lateral) {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  }
+  .panel-lateral {
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+  }
+}
+
+.panel-lateral article {
+  margin: 0;
+}
+
+.tabla-seleccionable tr[aria-selected='true'] td {
+  background: color-mix(in srgb, var(--pico-primary) 12%, transparent);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.paginacion button {
+  margin: 0;
+  padding: 0.25rem 0.75rem;
+}
+
+/* ---------- Código de acceso visible una vez ---------- */
+
+.codigo-una-vez {
+  margin: var(--pico-spacing) 0;
+  padding: 1rem;
+  border: 2px dashed var(--color-marca);
+  border-radius: var(--pico-border-radius);
+  text-align: center;
+}
+
+.codigo-una-vez p {
+  margin-bottom: 0.5rem;
+}
+
+.codigo-una-vez__valor {
+  display: block;
+  margin: 0.5rem 0;
+  font-family: var(--pico-font-family-monospace);
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+}
+
+/* ---------- Recepción (P11) ---------- */
+
+.recepcion {
+  max-width: 40rem;
+}
+
+.contador strong {
+  font-size: 1.75rem;
+  margin-left: 0.5rem;
+}
+
+.ficha-recepcion h2 {
+  margin-bottom: 0.5rem;
+}
+
+.etiqueta[class*='etiqueta--rol-'] {
+  font-size: 1rem;
+  padding: 0.15rem 0.75rem;
+  color: #fff;
+}
+
+.etiqueta--rol-administrador {
+  background: var(--rol-administrador);
+}
+.etiqueta--rol-organizador {
+  background: var(--rol-organizador);
+}
+.etiqueta--rol-participante {
+  background: var(--rol-participante);
+}
+.etiqueta--rol-visitante {
+  background: var(--rol-visitante);
+}
+
+/* ---------- Gestión de actividades (P9) ---------- */
+
+.formulario-actividad {
+  max-width: 48rem;
+}
+
+/* ---------- Panel (P12) ---------- */
+
+/* Medidor: un solo tono (serie secuencial azul) sobre una pista más clara de la
+   misma escala; validado contra la superficie clara y la oscura de Pico. */
+:root {
+  --medidor-relleno: #2a78d6;
+  --medidor-pista: #cde2fb;
+  --medidor-lleno: #d03b3b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --medidor-relleno: #3987e5;
+    --medidor-pista: #184f95;
+  }
+}
+
+.indicadores {
+  display: grid;
+  gap: var(--pico-spacing);
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  margin-bottom: var(--pico-spacing);
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.indicador__etiqueta {
+  color: var(--pico-muted-color);
+  font-size: 0.9rem;
+}
+
+.indicador__valor {
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.medidor-celda {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+}
+
+.medidor {
+  display: inline-block;
+  width: 8rem;
+  height: 0.6rem;
+  border-radius: 0.3rem;
+  background: var(--medidor-pista);
+  overflow: hidden;
+}
+
+.medidor > span {
+  display: block;
+  height: 100%;
+  border-radius: 0 0.3rem 0.3rem 0;
+  background: var(--medidor-relleno);
+}
+
+.medidor--lleno > span {
+  background: var(--medidor-lleno);
+}
+
+/* Casilla de permiso: la descripción en su propia línea, sin el margen negativo
+   que Pico da a los textos de ayuda dentro de <label>. */
+.opcion-permiso {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.opcion-permiso input {
+  margin-top: 0.2rem;
+}
+
+.opcion-permiso__descripcion {
+  display: block;
+  color: var(--pico-muted-color);
+  font-size: 0.85rem;
+}
+
+/* Las tablas se desplazan dentro de su figura en lugar de ensanchar la página. */
+main figure {
+  position: relative;
+  overflow-x: auto;
+}
+
+@media (max-width: 640px) {
+  .ocultar-movil {
+    display: none;
+  }
+}
