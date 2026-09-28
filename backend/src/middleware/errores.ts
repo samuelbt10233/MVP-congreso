@@ -1,4 +1,5 @@
 import type { ErrorRequestHandler, RequestHandler } from 'express';
+import { ZodError } from 'zod';
 
 /**
  * Error de negocio o de acceso con la forma única de error del diseño (§5).
@@ -35,6 +36,15 @@ export const rutaNoEncontrada: RequestHandler = (_req, res) => {
 export const manejadorErrores: ErrorRequestHandler = (err: unknown, _req, res, _next) => {
   if (err instanceof ErrorApi) {
     res.status(err.estado).json(cuerpoError(err.codigo, err.message, err.detalle));
+    return;
+  }
+
+  if (err instanceof ZodError) {
+    res.status(400).json(
+      cuerpoError('CUERPO_INVALIDO', 'Hay campos faltantes o con formato inválido.', {
+        campos: err.issues.map((i) => ({ campo: i.path.join('.'), mensaje: i.message })),
+      }),
+    );
     return;
   }
 
