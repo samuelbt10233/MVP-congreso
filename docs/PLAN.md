@@ -1,194 +1,112 @@
-# Plan de construcción del MVP
+# Plan de construcción del MVP (versión de demostración)
 
-Doce incrementos en orden. Cada uno es una tarea autónoma con criterios de aceptación verificables. No se pasa al siguiente hasta que el actual los cumple.
+Siete incrementos en orden. Cada uno es una tarea autónoma con criterios de aceptación verificables. No se pasa al siguiente hasta que el actual los cumple.
 
-Referencias entre corchetes (`[§4]`, `[I11]`, `[P6]`) apuntan a `docs/diseno-mvp.md`.
+Referencias entre corchetes (`[§4]`, `[I12]`, `[P6]`) apuntan a `docs/diseno-mvp.md`. Lo pospuesto está en `docs/deuda-mvp.md`.
 
 ---
 
-## 0. Andamiaje
+## 1. Andamiaje
 
 **Objetivo.** Repositorio ejecutable, vacío de lógica.
 
 - Monorepo con `backend/` y `frontend/`, workspaces de npm.
-- TypeScript estricto en ambos. ESLint y Prettier.
-- Express arriba con un `GET /api/v1/salud` que responde `{ "estado": "ok" }`.
-- Vite con React sirviendo una página en blanco y proxy hacia la API.
-- Scripts de `CLAUDE.md` funcionando.
+- TypeScript estricto en ambos. Prettier.
+- Express con `GET /api/v1/salud` que responde `{ "estado": "ok" }`, separado en `app.ts` (exportable para pruebas) e `index.ts` (arranque).
+- Manejador de errores central con la forma única de error y `404` uniforme para rutas desconocidas.
+- Vite con React sirviendo una página mínima y proxy de `/api` hacia el backend.
+- Vitest y supertest configurados, con una prueba de `salud`.
+- Scripts de `CLAUDE.md` funcionando (`reset` puede quedar como marcador hasta el incremento 2).
 
-**Aceptación.** `npm run dev` levanta ambos. `npm run typecheck` y `npm run lint` pasan. `GET /api/v1/salud` responde 200.
-
----
-
-## 1. Base de datos y migraciones
-
-**Objetivo.** Esquema creado y reproducible.
-
-- Módulo de conexión en `src/db/` que abre `database/congreso.db` y ejecuta `PRAGMA foreign_keys = ON` **en cada conexión** [regla 12].
-- Ejecutor de migraciones: lee `database/migraciones/*.sql` en orden, lleva registro de las aplicadas en una tabla `migracion`, es idempotente.
-- `001_esquema_inicial.sql` con el DDL completo de `[§3.2]`, copiado tal cual.
-- Semillas de catálogo: roles, permisos del catálogo `[§3.3]`, tipos de actividad, tipos de teléfono.
-
-**Aceptación.** `npm run migrar` sobre base vacía crea las 17 tablas. Ejecutarlo dos veces no falla ni duplica. `npm run sembrar` carga los catálogos. Prueba que verifica que las llaves foráneas se rechazan cuando corresponde.
+**Aceptación.** `npm run dev` levanta ambos. `npm run typecheck` y `npm run test` pasan. `GET /api/v1/salud` responde 200 y una ruta inexistente responde 404 con la forma única de error.
 
 ---
 
-## 2. Autenticación y permisos
+## 2. Esquema y semillas
 
-**Objetivo.** Poder iniciar sesión y proteger rutas. Es la base de todo lo demás.
+**Objetivo.** Base de datos recreable con datos de demo desde el inicio, para que cada incremento siguiente se pueda ver funcionando.
 
-- `utils/codigo.ts`: genera códigos de 5 caracteres, alfabeto de 32 sin `0`, `O`, `1`, `I`.
-- `utils/hash.ts`: bcrypt para el código.
-- `POST /auth/login` recibe `numero_documento` y `codigo`. Busca por documento, verifica el hash [reglas 1 a 4].
-- Bloqueo tras cinco intentos fallidos, con `bloqueado_hasta` en `usuario` [regla 5].
-- Emisión de token e invalidación en `POST /auth/salir`.
-- `GET /auth/yo` devuelve persona, rol y arreglo de permisos.
-- Middleware `autenticacion` y `exigePermiso(codigo)` [reglas 8 y 9].
-- Manejador de errores central con la forma única de error.
+- Módulo de conexión en `src/db/` que abre la base (ruta configurable; `:memory:` en pruebas) y ejecuta `PRAGMA foreign_keys = ON` en cada conexión [regla 12].
+- `database/esquema.sql` con el DDL de `[§3.2]`, copiado tal cual.
+- `npm run reset`: borra la base, aplica el esquema y carga las semillas.
+- Semillas de catálogo: roles, permisos `[§3.3]`, plantillas de rol `[§9.4]`, tipos de actividad, categorías.
+- Semilla de demo: edificios y salones de ejemplo; personas de los cuatro roles más una cuenta de recepción, con códigos de acceso conocidos; **cronograma de dos días generado alrededor de la hora actual** (actividades terminadas, en curso y próximas, en paralelo en varias zonas) `[I7]`; llegadas y asistencias ya registradas en las actividades pasadas.
+- Utilidades `utils/fechas.ts` (UTC `YYYY-MM-DD HH:MM:SS`, día local de Bogotá) y `utils/codigo.ts` (generador con alfabeto de 32 caracteres).
 
-**Aceptación.** Pruebas que demuestren: login correcto devuelve token; documento inexistente y código incorrecto devuelven **respuestas idénticas**; seis intentos fallidos devuelven `429`; una ruta protegida sin token da `401` y con token sin permiso da `403`; ninguna respuesta contiene `codigo_hash`.
+**Aceptación.** `npm run reset` sobre una base vacía crea las 12 tablas y los datos; ejecutarlo dos veces seguidas funciona. Prueba de que las llaves foráneas se rechazan. Prueba de que el índice de I4 rechaza dos llegadas de la misma persona a las 08:00 y a las 19:30 hora de Bogotá del mismo día.
 
 ---
 
-## 3. Personas
+## 3. Autenticación y permisos
 
-**Objetivo.** Directorio y alta de personas.
+**Objetivo.** Poder iniciar sesión y proteger rutas.
 
-- `GET /personas` con `persona.leer`, paginado.
-- `POST /personas` con `persona.crear`.
-- `GET /personas/{id}`, `PATCH /personas/{id}` con `persona.editar`.
-- Documento enmascarado para quien solo tenga `persona.leer`; completo con `persona.editar` [§9.6].
-- `GET /personas/{id}/permisos` y `PUT /personas/{id}/permisos` con `permiso.gestionar`.
-- Validación con Zod. Documento duplicado responde `409` [I6].
+- `utils/hash.ts` con `bcryptjs`.
+- `POST /auth/login`: busca por documento, verifica el hash, normaliza el código [§5]. Mismo `401` para todo fallo [regla 4].
+- Sesiones en memoria con token aleatorio y vigencia de 12 h; `POST /auth/salir`; `GET /auth/yo` con persona, rol y permisos.
+- Middleware `autenticacion` y `exigePermiso(codigo)`; los permisos se leen de la base en cada petición [reglas 8 y 9].
 
-**Aceptación.** Pruebas de cada permiso por separado. Prueba de que un usuario con solo `persona.leer` recibe el documento enmascarado. Prueba de `409` al repetir documento.
+**Aceptación.** Login correcto devuelve token; documento inexistente, código incorrecto y usuario inactivo devuelven **respuestas idénticas**; ruta protegida sin token da `401` y con token sin permiso da `403`; tras `salir` el token deja de servir; ninguna respuesta contiene `codigo_hash`.
 
 ---
 
-## 4. Usuarios y códigos de acceso
+## 4. API de dominio: personas, catálogos y actividades
 
-**Objetivo.** Emitir y rotar credenciales. Es el incremento con más riesgo de seguridad.
+**Objetivo.** Todo lo que se administra.
 
-- `POST /personas/{id}/usuario` crea el acceso y devuelve el código en claro **una sola vez**.
-- `POST /personas/{id}/usuario/regenerar` y `/desbloquear`, ambos con `usuario.gestionar`.
-- **Regla I11** en ambos: si la persona objetivo tiene algún permiso que el solicitante no posee, `403`. La consulta SQL está en `[§4]`.
-- Regenerar invalida las sesiones activas de esa persona [regla 7].
+- `GET /catalogos`.
+- Personas: listado con búsqueda y paginación, detalle, alta, edición, permisos, generación de código [§5]. Enmascarado del documento y ocultación de correo y teléfono sin `persona.editar`. Documento duplicado `409` [I6]. Alta aplica la plantilla del rol y devuelve el código una vez; **regla I12**.
+- Actividades: listado con filtros (el `dia` local se convierte a rango UTC), detalle, alta, edición, cancelación. Código de actividad generado al crear. **I1** dentro de la transacción [regla 13], `409` con la actividad que ocupa la zona. `codigo` omitido sin `actividad.gestionar` [regla 10].
 
-**Aceptación.** Prueba explícita de I11 con tres casos: recepción sobre visitante (permitido), recepción sobre administrador (`403`), administrador sobre recepción (permitido). Prueba de que el código en claro no aparece en ninguna consulta posterior. Prueba de que la sesión previa deja de servir tras regenerar.
-
----
-
-## 5. Zonas
-
-**Objetivo.** Inventario del campus.
-
-- CRUD de `edificio` y `zona` con `zona.gestionar`.
-- `GET /edificios`, `GET /edificios/{id}/zonas` y `GET /zonas` abiertos a cualquier persona autenticada.
-- Semilla con los bloques y salones reales si ya están disponibles; si no, datos de ejemplo marcados como tales.
-
-**Aceptación.** Un organizador (sin `zona.gestionar`) puede listar zonas pero recibe `403` al crear.
+**Aceptación.** Prueba de I12: una cuenta de recepción da de alta un visitante (`201` con código) y recibe `403` al pedir rol organizador. Prueba de enmascarado con solo `persona.leer`. Prueba de `409` por documento repetido. Prueba de solapamiento en sus tres formas (inicio dentro, fin dentro, contención) y de que actividades contiguas **sí** se permiten. Prueba de que el listado no incluye el código para un visitante.
 
 ---
 
-## 6. Actividades
+## 5. Registros y panel
 
-**Objetivo.** El cronograma, con su invariante más delicada.
+**Objetivo.** Los dos flujos que producen los datos del congreso y su resumen.
 
-- CRUD con `actividad.gestionar`; listado abierto con filtros por día, zona, tipo y categoría.
-- Generación del `codigo` de actividad al crear: 4 caracteres, único, sin ambiguos.
-- **I1**: verificación de solapamiento por zona dentro de la misma transacción [regla 13]. Conflicto responde `409` indicando qué actividad ocupa el rango.
-- **I2** vía `CHECK` ya presente en el esquema.
-- `codigo` se omite de la respuesta para quien no tenga `actividad.gestionar` [regla 10].
-- `POST /actividades/{id}/cancelar`.
+- `GET /recepcion/buscar`, `POST /registros/llegada` [I4, §6.1], `GET /registros/llegada?dia=`.
+- `POST /registros/asistencia` con validaciones en orden: código existente (`422`), no cancelada (`422`) [I9], dentro de ventana (`422`) [I7], sin registro previo (`409`) [I3]. Ventana configurable por entorno.
+- `GET /registros/asistencia/mias`; `GET /actividades/{id}/asistentes` con `registro.leer` o siendo responsable.
+- `GET /estadisticas`.
 
-**Aceptación.** Prueba de solapamiento en sus tres formas: inicio dentro de otra actividad, fin dentro de otra, y una que contiene por completo a otra. Prueba de que actividades contiguas (una termina justo cuando empieza la siguiente) **sí** se permiten. Prueba de que el listado no filtra el código para un visitante.
+**Aceptación.** Prueba de llegada duplicada el mismo día (`409` con la hora previa). Prueba de cada uno de los cuatro rechazos de asistencia con su código. Prueba de que el responsable ve sus asistentes sin `registro.leer`. Las estadísticas cuadran contra consultas directas sobre la semilla.
 
 ---
 
-## 7. Registros
+## 6. Frontend: cimientos y pantallas base
 
-**Objetivo.** Los dos flujos que producen los datos del congreso.
+**Objetivo.** Sesión, permisos y lo que ve cualquier persona autenticada [P1 a P5].
 
-- `GET /recepcion/buscar?documento=` con `llegada.registrar`, devuelve solo nombre, rol y estado de llegada [§6.1].
-- `POST /registros/llegada` con `llegada.registrar`. **I4**: una llegada por persona y día local de Bogotá. Duplicado responde `409` con la hora del registro previo.
-- `POST /registros/asistencia` abierto a cualquier persona autenticada, recibe `codigo`, toma la persona del token.
-- Validaciones en orden: código existente (`422`), actividad no cancelada (`422`) [I9], dentro de ventana (`422`) [I7], sin registro previo (`409`) [I3].
-- Ventana configurable, por defecto desde 15 minutos antes del inicio hasta el fin.
-- `GET /registros/asistencia/mias` y `GET /actividades/{id}/asistentes`, este último permitido también al responsable de la actividad sin `registro.leer` [§9.4].
-
-**Aceptación.** Prueba del caso de borde de I4: llegada a las 19:30 hora de Bogotá y otra a las 08:00 del mismo día local deben chocar. Prueba de cada uno de los cuatro rechazos de asistencia con su código correcto. Prueba de que el responsable ve sus asistentes sin tener `registro.leer`.
-
----
-
-## 8. Estadísticas
-
-**Objetivo.** Lo que verá la Vicerrectoría en la demo.
-
-- `GET /estadisticas/resumen`: total de llegadas por día, total de asistencias, actividades en curso.
-- `GET /estadisticas/asistencia-por-actividad`: asistentes por actividad y ocupación contra la capacidad de la zona.
-- Ambos con `estadistica.leer`.
-
-**Aceptación.** Los números cuadran contra consultas directas a la base sobre el juego de datos de demo.
-
----
-
-## 9. Frontend: cimientos
-
-**Objetivo.** Sesión y permisos funcionando antes de dibujar pantallas.
-
-- Cliente HTTP con el token, manejo uniforme del error del backend y redirección a login ante `401`.
+- Cliente HTTP con el token (`sessionStorage`), manejo uniforme del error del backend y redirección a login ante `401`.
 - Contexto de sesión, `usePermisos`, componente `Puede` [§9.2, §9.9].
-- Router con guards por permiso y pantalla de acceso denegado.
-- Menú de navegación construido desde `permisos`, no desde el rol [regla 9].
-- Pantalla de acceso: dos campos, el del código normaliza a mayúscula e ignora espacios y guiones [§9.7].
+- Router con guards por permiso y pantalla de acceso denegado; menú construido desde `permisos` [regla 9].
+- Pantalla de acceso: documento y código, este normalizado a mayúscula sin espacios ni guiones [§9.7].
+- P1 Inicio adaptativo, P2 Cronograma con filtros y detalle, P3 Mi perfil con escarapela, P4 Registrar asistencia, P5 Mis asistencias.
+- Estilo base con Pico CSS; fechas mostradas en hora de Bogotá.
 
-**Aceptación.** Iniciar sesión con cuatro personas de distintos roles produce cuatro menús distintos. Entrar por URL directa a una ruta sin permiso muestra acceso denegado.
-
----
-
-## 10. Frontend: pantallas base
-
-**Objetivo.** Lo que ve cualquier persona autenticada [P1 a P5].
-
-- P1 Inicio adaptativo por permisos [§9.10].
-- P2 Cronograma con filtros; sin mostrar el código de actividad salvo con `actividad.gestionar`.
-- P3 Mi perfil con la vista de escarapela.
-- P4 Registrar asistencia: campo de código y confirmación.
-- P5 Mis asistencias.
-
-**Aceptación.** Un visitante completa el flujo de marcar asistencia de principio a fin. El código de actividad no aparece en ninguna parte de su interfaz.
+**Aceptación.** Iniciar sesión con cuatro personas de distintos roles produce cuatro menús distintos. Entrar por URL a una ruta sin permiso muestra acceso denegado. Un visitante marca asistencia de principio a fin y el código de actividad no aparece en su interfaz.
 
 ---
 
-## 11. Frontend: pantallas de gestión
+## 7. Frontend de gestión y guion de demo
 
-**Objetivo.** [P6 a P13], con la visibilidad de elementos de `[§9.6]`.
+**Objetivo.** [P6, P9, P11, P12] y dejarlo presentable.
 
-- P6 Directorio, P7 alta, P7b edición, P8 permisos.
-- P9 Gestión de actividades, P10 zonas.
-- P11 Recepción: búsqueda por documento, registro de llegada, alta de persona nueva, generación de código visible una sola vez.
-- P12 Registros, P13 Estadísticas.
+- P6 Directorio con formulario lateral de alta, edición, permisos y generación de código.
+- P9 Gestión de actividades, mostrando el `409` de solapamiento de forma comprensible.
+- P11 Recepción: búsqueda por documento, registro de llegada, alta de persona nueva con código visible una sola vez.
+- P12 Panel con totales, ocupación y llegadas del día.
+- `docs/demo.md` con el guion de la presentación y las credenciales de prueba.
+- Repaso final contra las reglas de `CLAUDE.md`, una por una.
 
-**Aceptación.** Recorrido con una cuenta de recepción: encuentra a una persona, registra su llegada, da de alta a una no registrada y le entrega un código. No ve el directorio completo ni puede editar a nadie.
-
----
-
-## 12. Datos de demo y repaso
-
-**Objetivo.** Dejarlo presentable para el cliente.
-
-- Semilla de demostración: bloques y salones, dos días de cronograma con actividades en paralelo, personas de los cuatro roles, una cuenta de recepción, llegadas y asistencias ya registradas para que las estadísticas no salgan vacías.
-- Guion de demostración breve en `docs/demo.md` con las credenciales de prueba.
-- Repaso final contra las quince reglas de `CLAUDE.md`, una por una.
-
-**Aceptación.** Base recreable desde cero con `npm run migrar && npm run sembrar`. Las estadísticas muestran datos verosímiles. Ninguna regla de `CLAUDE.md` incumplida.
+**Aceptación.** Recorrido con la cuenta de recepción: encuentra a una persona, registra su llegada, da de alta a una no registrada y le entrega un código; no ve el directorio ni puede editar a nadie. La base se recrea con `npm run reset` y el panel muestra datos verosímiles.
 
 ---
 
 ## Notas de ejecución
 
-El orden importa. Los incrementos 2 y 4 sostienen la seguridad del resto; si se dejan para el final, todo lo construido encima habrá que revisarlo.
+El orden importa. El incremento 3 sostiene la autorización del resto; los incrementos 4 y 5 concentran las invariantes y son los que merecen revisión humana del código, no solo pruebas verdes.
 
-Los incrementos 4, 6 y 7 concentran las invariantes. Son los que merecen revisión humana del código, no solo pruebas verdes.
-
-Nada en este plan cubre escarapelas en PDF, envío de correo ni mapa 3D. Están fuera del MVP a propósito [§1].
+Nada en este plan cubre escarapelas en PDF, envío de correo, mapa 3D ni lo inventariado en `docs/deuda-mvp.md`.
