@@ -381,6 +381,19 @@ Devuelve llegadas por día, total de asistencias, actividades en curso y, por ac
 | `409` | Conflicto de estado: documento duplicado, asistencia o llegada ya registrada, solapamiento de horario |
 | `422` | Regla de negocio incumplida: código inválido, fuera de ventana, actividad cancelada |
 
+Códigos de error estables que el frontend puede interpretar:
+
+| Estado | `codigo` |
+|---|---|
+| `400` | `CUERPO_INVALIDO` (cuerpo), `PARAMETRO_INVALIDO` (ruta o consulta). `detalle.campos` lista cada campo con su mensaje |
+| `401` | `CREDENCIALES_INVALIDAS` (login), `NO_AUTENTICADO` (sin sesión o vencida) |
+| `403` | `SIN_PERMISO` (`detalle.permiso`), `ALTA_ROL_NO_PERMITIDA` (I12) |
+| `404` | `RUTA_NO_ENCONTRADA`, `PERSONA_NO_ENCONTRADA`, `ACTIVIDAD_NO_ENCONTRADA` |
+| `409` | `DOCUMENTO_DUPLICADO`, `HORARIO_OCUPADO` (`detalle.actividad` es la que ocupa la zona), `ACTIVIDAD_YA_CANCELADA` |
+| `422` | `HORARIO_INVALIDO` (I2), `REFERENCIA_INVALIDA` (`detalle.campo`) |
+
+Los instantes (`inicio`, `fin`) se reciben en ISO-8601 con zona horaria explícita (`2026-10-15T08:00:00-05:00`) o en UTC `YYYY-MM-DD HH:MM:SS`, y siempre se devuelven en UTC `YYYY-MM-DD HH:MM:SS`.
+
 Cuerpo de error uniforme:
 
 ```json

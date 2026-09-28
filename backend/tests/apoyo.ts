@@ -27,5 +27,27 @@ export async function crearEntorno(opciones: { sesiones?: AlmacenSesiones; ahora
     return res.body.token as string;
   }
 
-  return { bd, sesiones, app, tokenDe };
+  /** Cliente HTTP autenticado como una cuenta de demo. */
+  async function como(clave: ClaveCuenta) {
+    const autorizacion = `Bearer ${await tokenDe(clave)}`;
+    return {
+      get: (url: string) => request(app).get(url).set('Authorization', autorizacion),
+      post: (url: string, cuerpo: object = {}) =>
+        request(app).post(url).set('Authorization', autorizacion).send(cuerpo),
+      patch: (url: string, cuerpo: object) =>
+        request(app).patch(url).set('Authorization', autorizacion).send(cuerpo),
+      put: (url: string, cuerpo: object) =>
+        request(app).put(url).set('Authorization', autorizacion).send(cuerpo),
+    };
+  }
+
+  /** Id de una fila por una columna única; para preparar escenarios. */
+  function idDe(tabla: string, columna: string, valor: string): number {
+    const fila = bd.prepare(`SELECT id FROM ${tabla} WHERE ${columna} = ?`).get(valor) as
+      { id: number } | undefined;
+    if (!fila) throw new Error(`No existe ${tabla}.${columna} = ${valor}`);
+    return fila.id;
+  }
+
+  return { bd, sesiones, app, tokenDe, como, idDe };
 }
