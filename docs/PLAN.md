@@ -86,7 +86,7 @@ Referencias entre corchetes (`[§4]`, `[I12]`, `[P6]`) apuntan a `docs/diseno-mv
 - P1 Inicio adaptativo, P2 Cronograma con filtros y detalle, P3 Mi perfil con escarapela, P4 Registrar asistencia, P5 Mis asistencias.
 - Estilo base con Pico CSS; fechas mostradas en hora de Bogotá.
 
-**Aceptación.** Iniciar sesión con cuatro personas de distintos roles produce cuatro menús distintos. Entrar por URL a una ruta sin permiso muestra acceso denegado. Un visitante marca asistencia de principio a fin y el código de actividad no aparece en su interfaz.
+**Aceptación.** Iniciar sesión con cuatro cuentas de distintos permisos (administrador, organizador, recepción y visitante) produce cuatro menús distintos. Participante y visitante comparten menú porque sus plantillas no otorgan permisos: el menú depende solo de los permisos (regla 8). Entrar por URL a una ruta sin permiso muestra acceso denegado. Un visitante marca asistencia de principio a fin y el código de actividad no aparece en su interfaz.
 
 ---
 
