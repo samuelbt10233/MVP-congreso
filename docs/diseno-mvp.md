@@ -264,6 +264,7 @@ Donde SQLite no puede imponerlas, se aplican en la capa de servicio. La columna 
 | I9 | No se registra asistencia a una actividad cancelada | Servicio | Servicio |
 | I10 | El código de acceso se guarda con bcrypt, nunca en claro | Servicio | Servicio |
 | I12 | Quien no tiene `permiso.gestionar` solo puede dar de alta personas con rol visitante, y nacen sin permisos | Servicio: `403` si se pide otro rol | Servicio |
+| I13 | Nadie puede quitarse a sí mismo `permiso.gestionar` | Servicio: `422` | Servicio |
 
 I11 (no escalada al regenerar códigos) queda pospuesta. En su lugar, `usuario.gestionar` solo lo recibe el administrador por plantilla, y el paquete de recepción no lo incluye. Ver `docs/deuda-mvp.md`.
 
@@ -390,7 +391,7 @@ Códigos de error estables que el frontend puede interpretar:
 | `403` | `SIN_PERMISO` (`detalle.permiso`), `ALTA_ROL_NO_PERMITIDA` (I12) |
 | `404` | `RUTA_NO_ENCONTRADA`, `PERSONA_NO_ENCONTRADA`, `ACTIVIDAD_NO_ENCONTRADA` |
 | `409` | `DOCUMENTO_DUPLICADO`, `HORARIO_OCUPADO` (`detalle.actividad` es la que ocupa la zona), `ACTIVIDAD_YA_CANCELADA` |
-| `422` | `HORARIO_INVALIDO` (I2), `REFERENCIA_INVALIDA` (`detalle.campo`) |
+| `422` | `HORARIO_INVALIDO` (I2), `REFERENCIA_INVALIDA` (`detalle.campo`), `AUTOREVOCACION_NO_PERMITIDA` (I13) |
 
 Los instantes (`inicio`, `fin`) se reciben en ISO-8601 con zona horaria explícita (`2026-10-15T08:00:00-05:00`) o en UTC `YYYY-MM-DD HH:MM:SS`, y siempre se devuelven en UTC `YYYY-MM-DD HH:MM:SS`.
 

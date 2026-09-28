@@ -116,7 +116,7 @@ Son consecuencia directa del diseño. Violarlas rompe seguridad o corrección, n
 ## Cómo trabajar
 
 - Una tarea a la vez, siguiendo `docs/PLAN.md`. No adelantes incrementos.
-- Antes de escribir código, si la tarea toca una invariante (I1 a I12), di cuál y cómo la vas a cumplir.
+- Antes de escribir código, si la tarea toca una invariante (I1 a I13), di cuál y cómo la vas a cumplir.
 - Cada incremento termina con sus pruebas pasando y `npm run typecheck` limpio.
 - Las invariantes se prueban explícitamente, no se asumen.
 - No instales dependencias que no estén en el stack de arriba sin preguntar.

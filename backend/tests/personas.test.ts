@@ -229,6 +229,25 @@ describe('permisos de una persona', () => {
     expect(vaciar.body.permisos).toEqual([]);
   });
 
+  it('I13: el administrador no puede quitarse a sí mismo permiso.gestionar', async () => {
+    const admin = await entorno.como('administrador');
+    const id = idPersona('administrador');
+    const res = await admin.put(`/api/v1/personas/${id}/permisos`, {
+      permisos: ['persona.leer'],
+    });
+    expect(res.status).toBe(422);
+    expect(res.body.error.codigo).toBe('AUTOREVOCACION_NO_PERMITIDA');
+    expect((await admin.get(`/api/v1/personas/${id}/permisos`)).body.permisos).toContain(
+      'permiso.gestionar',
+    );
+
+    // Sí puede ajustar el resto de sus permisos si conserva ese.
+    const ajuste = await admin.put(`/api/v1/personas/${id}/permisos`, {
+      permisos: ['permiso.gestionar', 'persona.leer'],
+    });
+    expect(ajuste.status).toBe(200);
+  });
+
   it('rechaza permisos que no existen en el catálogo', async () => {
     const admin = await entorno.como('administrador');
     const res = await admin.put(`/api/v1/personas/${idPersona('participante')}/permisos`, {

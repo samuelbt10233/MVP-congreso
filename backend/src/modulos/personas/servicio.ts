@@ -194,6 +194,17 @@ export function reemplazarPermisos(
   id: number,
   permisos: readonly CodigoPermiso[],
 ): string[] {
+  // I13: quien gestiona permisos no puede quitarse ese permiso a sí mismo; se
+  // quedaría sin forma de devolvérselo.
+  if (id === sesion.persona.id && !permisos.includes('permiso.gestionar')) {
+    throw new ErrorApi(
+      422,
+      'AUTOREVOCACION_NO_PERMITIDA',
+      'No puedes quitarte a ti mismo el permiso de gestionar permisos.',
+      { permiso: 'permiso.gestionar' },
+    );
+  }
+
   ctx.bd.transaction(() => {
     exigirPersona(ctx, id);
     revocarPermisosSalvo(ctx.bd, id, permisos);
